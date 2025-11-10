@@ -1,3 +1,4 @@
+Server\Server$PendingClient.class
 Server\SessionManager.class
 Server\LoginProcessor.class
 Client\UserInfoHandler.class
@@ -5,6 +6,8 @@ Server\ClientHandler.class
 Server\SessionManager$PendingClient.class
 Server\SessionManager$LoginDecision.class
 Client\RegisterHandler.class
+Server\Server.class
 Client\FileSyncManager.class
+Server\Server$LoginDecision.class
 Server\ServerMain.class
 Server\ServerView.class

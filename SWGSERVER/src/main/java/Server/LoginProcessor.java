@@ -15,8 +15,8 @@ import java.net.Socket;
 public class LoginProcessor {
     private final SessionManager sessionManager;
 
-    public LoginProcessor(SessionManager sessionManager) {
-        this.sessionManager = sessionManager;
+    public LoginProcessor() {
+        this.sessionManager = SessionManager.getInstance();
     }
 
     public boolean validateLogin(String userId, String password, String role) {

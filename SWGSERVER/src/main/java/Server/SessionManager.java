@@ -14,11 +14,14 @@ import java.net.Socket;
 import java.util.*;
 
 public class SessionManager {
+    private static final int MAX_USER=4;
     private final int maxUsers;
     private final Set<String> active = new HashSet<>();  // 사용자만 저장
     private final Queue<PendingClient> queue = new ArrayDeque<>();
-
-    public SessionManager(int maxUsers) {
+    
+    private static final SessionManager uniqueInstance = new SessionManager(MAX_USER);
+    
+    private SessionManager(int maxUsers) {
         this.maxUsers = maxUsers;
     }
 
@@ -35,11 +38,14 @@ public class SessionManager {
             this.out = out;
         }
     }
-
+    
+    public static SessionManager getInstance(){
+        return uniqueInstance;
+    }
     public synchronized LoginDecision tryLogin(String userId, PendingClient pending) {
-            if (active.contains(userId)) {
-        System.out.println("중복 로그인 시도 감지: " + userId);
-        return LoginDecision.FAIL_DUP;
+        if (active.contains(userId)) {
+            System.out.println("중복 로그인 시도 감지: " + userId);
+            return LoginDecision.FAIL_DUP;
     }
         if (active.size() < maxUsers) {
             active.add(userId); // 사용자만 저장

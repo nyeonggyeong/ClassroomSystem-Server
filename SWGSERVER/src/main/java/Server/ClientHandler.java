@@ -19,13 +19,15 @@ public class ClientHandler extends Thread {
 
     private final Socket socket;
     private final SessionManager sessionManager;
+    private LoginProcessor loginProcessor;
     private BufferedReader in;
     private BufferedWriter out;
     private String userId = null;
 
-    public ClientHandler(Socket socket, SessionManager sessionManager) {
+    public ClientHandler(Socket socket) {
         this.socket = socket;
-        this.sessionManager = sessionManager;
+        this.sessionManager = SessionManager.getInstance();
+        this.loginProcessor = new LoginProcessor();
         try {
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -70,7 +72,7 @@ public class ClientHandler extends Thread {
                     String password = parts[1].trim();
                     String role = parts[2].trim();
 
-                    boolean valid = validateLogin(userId, password, role);
+                    boolean valid = loginProcessor.validateLogin(userId, password, role);
                     System.out.println("[서버] 로그인 검증 결과: " + valid);
                     if (!valid) {
                         out.write("FAIL");
@@ -88,10 +90,10 @@ public class ClientHandler extends Thread {
                         continue;
                     }
 
-                    SessionManager.PendingClient pending
-                            = new SessionManager.PendingClient(socket, userId, out);
+//                    SessionManager.PendingClient pending
+//                            = new SessionManager.PendingClient(socket, userId, out);
                     SessionManager.LoginDecision result
-                            = sessionManager.tryLogin(userId, pending);
+                            = loginProcessor.tryUserLogin(userId, socket, out);
 
                     if (result == SessionManager.LoginDecision.OK) {
                         out.write("LOGIN_SUCCESS");
@@ -150,25 +152,5 @@ public class ClientHandler extends Thread {
                 System.out.println("[서버] 종료 ");
             }
         }
-    }
-
-    private boolean validateLogin(String userId, String password, String role) {
-        String filePath = role.equalsIgnoreCase("admin")
-                ? "src/main/resources/ADMIN_LOGIN.txt"
-                : "src/main/resources/USER_LOGIN.txt";
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 2
-                        && parts[0].trim().equals(userId)
-                        && parts[1].trim().equals(password)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("[서버] 로그인 검증 오류: " + e.getMessage());
-        }
-        return false;
     }
 }

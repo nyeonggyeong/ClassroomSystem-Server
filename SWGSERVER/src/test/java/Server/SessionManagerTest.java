@@ -12,7 +12,8 @@ public class SessionManagerTest {
 
     @Test
     public void testLoginLimitReached() throws IOException {
-        SessionManager manager = new SessionManager(1);
+        
+        SessionManager manager = new SessionManager.getInstance();
         Socket dummySocket = new Socket();
         BufferedWriter dummyOut = new BufferedWriter(new OutputStreamWriter(System.out));
         SessionManager.PendingClient dummy = new SessionManager.PendingClient(dummySocket, "user1", dummyOut);

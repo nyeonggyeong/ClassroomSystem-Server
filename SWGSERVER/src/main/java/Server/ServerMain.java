@@ -44,8 +44,8 @@ public class ServerMain {
             e.printStackTrace();
         }
 
-        // 세션 매니저 생성 (최대 3명)
-        SessionManager sessionManager = new SessionManager(3);
+        // 세션 매니저 생성 (최대 4명) SingleTurn Pattern 적용
+//        SessionManager sessionManager = new SessionManager(3);
 
         // ServerSocket 바인딩 시도
         ServerSocket serverSocket;
@@ -65,7 +65,8 @@ public class ServerMain {
         while (true) {
             try {
                 Socket clientSocket = serverSocket.accept();
-                new Thread(new ClientHandler(clientSocket, sessionManager)).start();
+                // [TODO] sessionManager 객체 제거
+                new Thread(new ClientHandler(clientSocket)).start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
