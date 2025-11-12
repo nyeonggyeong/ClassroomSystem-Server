@@ -14,14 +14,28 @@ import java.net.Socket;
 
 public class LoginProcessor {
     private final SessionManager sessionManager;
-
+    private static final String adminLoginPath = "src/main/resources/ADMIN_LOGIN.txt";
+    private static final String userLoginPath = "src/main/resources/USER_LOGIN.txt";
+    private static final String professorLoginPath = "src/main/resources/PROFESSOR_LOGIN.txt";
+    
     public LoginProcessor() {
         this.sessionManager = SessionManager.getInstance();
     }
 
     public boolean validateLogin(String userId, String password, String role) {
-        String fileName = role.equals("admin") ? "src/main/resources/ADMIN_LOGIN.txt" : "src/main/resources/USER_LOGIN.txt";
-        try (var reader = new java.io.BufferedReader(new java.io.FileReader(fileName))) {
+        // 이후 변수 이름 변경
+        String resultFilePath = "";
+  
+        if (role.equals("admin")) {
+            resultFilePath = adminLoginPath;
+        } else if (role.equals("professor")) {
+            resultFilePath = professorLoginPath;
+        } else {
+            resultFilePath = userLoginPath;
+        }
+            
+        //String fileName = role.equals("admin") ? "src/main/resources/ADMIN_LOGIN.txt" : "src/main/resources/USER_LOGIN.txt";
+        try (var reader = new java.io.BufferedReader(new java.io.FileReader(resultFilePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(",");

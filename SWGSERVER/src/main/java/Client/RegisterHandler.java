@@ -53,7 +53,13 @@ public class RegisterHandler {
         if ("admin".equalsIgnoreCase(role)) {
             // 관리자: ADMIN_LOGIN.txt 에만 저장
             success = writeLine(new File(dir, "ADMIN_LOGIN.txt"), id + "," + pw);
-        } else {
+        } else if ("교수".equalsIgnoreCase(role)) {
+            boolean a = writeLine(new File(dir, "PROFESSOR_LOGIN.txt"), id + "," + pw);
+            boolean b = writeLine(new File(dir, "USER_INFO.txt"),
+                                  String.join(",", id, pw, name, dept, role));
+            success = a && b;
+        } 
+        else {
             // 학생/교수: USER_LOGIN + USER_INFO
             boolean a = writeLine(new File(dir, "USER_LOGIN.txt"), id + "," + pw);
             boolean b = writeLine(new File(dir, "USER_INFO.txt"),

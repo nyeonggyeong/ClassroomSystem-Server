@@ -132,6 +132,19 @@ public class ClientHandler extends Thread {
                     }
                     continue;
                 }
+                // ─── 백업 처리 ───────────────────────────────────
+                if (msg.equals("BACKUP_REQUEST")) {
+                    System.out.println("[서버] 백업 요청");
+                    
+                    FileSyncManager manager = new FileSyncManager();
+                    String result = manager.createBackup();
+                    
+                    out.write(result);
+                    out.newLine();
+                    out.flush();
+                    System.out.println("[서버] 백업 응답: " + result);
+                    continue;
+                }
                 // ─── 로그아웃 처리 ────────────────────────────────────
                 if (input.equals("LOGOUT")) {
         System.out.println("로그아웃 요청 수신: " + userId);

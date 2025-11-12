@@ -4,8 +4,8 @@ package Server;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 /**
+ * 싱글턴 패턴 사용
  *
  * @author adsd3
  */
@@ -14,20 +14,25 @@ import java.net.Socket;
 import java.util.*;
 
 public class SessionManager {
-    private static final int MAX_USER=4;
+
+    private static final int MAX_USER = 4;
     private final int maxUsers;
     private final Set<String> active = new HashSet<>();  // 사용자만 저장
-    private final Queue<PendingClient> queue = new ArrayDeque<>();
-    
+    private final Queue<PendingClient> queue = new ArrayDeque<>(); // 대기 사용자 저장
+
     private static final SessionManager uniqueInstance = new SessionManager(MAX_USER);
-    
+
     private SessionManager(int maxUsers) {
         this.maxUsers = maxUsers;
     }
 
-    public enum LoginDecision { OK, WAIT, FAIL_DUP }
+    public enum LoginDecision {
+        OK, WAIT, FAIL_DUP
+    }
 
+    // 대기 사용자 클래스
     public static class PendingClient {
+
         public final Socket socket;
         public final String userId;
         public final BufferedWriter out;
@@ -38,15 +43,17 @@ public class SessionManager {
             this.out = out;
         }
     }
-    
-    public static SessionManager getInstance(){
+
+    public static SessionManager getInstance() {
         return uniqueInstance;
     }
+
     public synchronized LoginDecision tryLogin(String userId, PendingClient pending) {
+        // 아이디 만으로 중복 로그인을 시도하면 동일 아이디에 대한 제한이 있어야하거나, 조건이 더 필요
         if (active.contains(userId)) {
             System.out.println("중복 로그인 시도 감지: " + userId);
             return LoginDecision.FAIL_DUP;
-    }
+        }
         if (active.size() < maxUsers) {
             active.add(userId); // 사용자만 저장
             return LoginDecision.OK;
@@ -62,7 +69,9 @@ public class SessionManager {
     }
 
     public synchronized void nextClient() {
-        if (active.size() >= maxUsers || queue.isEmpty()) return;
+        if (active.size() >= maxUsers || queue.isEmpty()) {
+            return;
+        }
 
         PendingClient next = queue.poll();
         try {
