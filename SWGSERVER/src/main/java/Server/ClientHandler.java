@@ -14,6 +14,7 @@ import java.net.Socket;
 
 import Client.RegisterHandler;     // 서버 쪽 핸들러
 import Client.UserInfoHandler;     // 서버 쪽 핸들러
+import java.util.List;
 
 public class ClientHandler extends Thread {
 
@@ -54,6 +55,7 @@ public class ClientHandler extends Thread {
                 if (msg.startsWith("INFO_REQUEST:")) {
                     UserInfoHandler infoHandler = new UserInfoHandler(socket, out);
                     infoHandler.handle(msg);
+                    System.out.println("사용자 요청 처리");
                     continue;
                 }
 
@@ -96,10 +98,27 @@ public class ClientHandler extends Thread {
                             = loginProcessor.tryUserLogin(userId, socket, out);
 
                     if (result == SessionManager.LoginDecision.OK) {
+//                        List<String> usersData = sessionManager.checkUser();
                         out.write("LOGIN_SUCCESS");
                         out.newLine();
                         out.flush();
                         System.out.println("[서버] 응답: LOGIN_SUCCESS (user)");
+                        List<String> pendingNotifications = sessionManager.getPendingCancelNotifications(userId);
+                        if (!pendingNotifications.isEmpty()) {
+                            StringBuilder cancelMsg = new StringBuilder("CANCEL_NOTIFICATION:");
+                            for (int i = 0; i < pendingNotifications.size(); i++) {
+                                if (i > 0) {
+                                    cancelMsg.append(";");
+                                }
+                                cancelMsg.append(pendingNotifications.get(i));
+                            }
+
+                            out.write(cancelMsg.toString());
+                            out.newLine();
+                            out.flush();
+                            System.out.println("[서버] 메시지: " + cancelMsg.toString());
+                            System.out.println("[서버] 로그인 후 대기 중이던 취소 알림 전송: " + userId);
+                        }
                     } else if (result == SessionManager.LoginDecision.WAIT) {
                         out.write("WAIT");
                         out.newLine();
@@ -135,21 +154,46 @@ public class ClientHandler extends Thread {
                 // ─── 백업 처리 ───────────────────────────────────
                 if (msg.equals("BACKUP_REQUEST")) {
                     System.out.println("[서버] 백업 요청");
-                    
+
                     FileSyncManager manager = new FileSyncManager();
                     String result = manager.createBackup();
-                    
+
                     out.write(result);
                     out.newLine();
                     out.flush();
                     System.out.println("[서버] 백업 응답: " + result);
                     continue;
                 }
+                // ─── 사용자 예약 취소 알람 처리 ───────────────────────────────────
+                if (msg.startsWith("CANCEL_RESERVATION:")) {
+                    System.out.println("[서버] 사용자 예약 취소 알람 처리");
+                    String userDatas = msg.substring("CANCEL_RESERVATION:".length());
+
+                    if (userDatas.isEmpty()) {
+                        System.out.println("[서버] 취소 사용자 없음");
+                        continue;
+                    }
+                    String[] userData = userDatas.split(";");
+                    for (String data : userData) {
+                        if (!data.isEmpty()) {
+                            sessionManager.addCancelUser(data);
+                        }
+                    }
+                    continue;
+
+                }
+                // ─── 사용자 정보 처리 ───────────────────────────────────
+                if (msg.equals("USER_INFO")) {
+                    System.out.println("[서버] 사용자 정보 처리");
+                    UserInfoHandler userInfo = new UserInfoHandler(socket, out);
+                    userInfo.getUserInfo();
+                    continue;
+                }
                 // ─── 로그아웃 처리 ────────────────────────────────────
-                if (input.equals("LOGOUT")) {
-        System.out.println("로그아웃 요청 수신: " + userId);
-        sessionManager.logout(userId);  // 세션에서 제거
-        break; // 스레드 종료
+                if (msg.equals("LOGOUT")) {
+                    System.out.println("로그아웃 요청 수신: " + userId);
+                    sessionManager.logout(userId);  // 세션에서 제거
+                    break; // 스레드 종료
                 }
             }
         } catch (IOException e) {

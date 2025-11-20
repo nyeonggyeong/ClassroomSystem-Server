@@ -11,3 +11,4 @@ duatmddnr,1234,염승욱,컴소,교수
 p-duatmddnr,1234,염승욱,컴소,교수
 dhkdrjs,dhkdrjs,테스트,소프트웨어,교수
 dhkdrjs,dhkdrjs,테스트,소프트웨어,교수
+dhkdrjs2,dhkdrjs2,테스트2,컴소,교수

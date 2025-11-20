@@ -10,6 +10,7 @@ package Client;
  */
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class UserInfoHandler {
 
@@ -46,6 +47,7 @@ public class UserInfoHandler {
 
                     if (studentId.equals(requestedId)) {
                         String response = String.format("INFO_RESPONSE:%s,%s,%s,%s\n", studentId, name, department, role);
+                        System.out.println(response);
                         out.write(response);
                         out.flush();
                         return;
@@ -56,5 +58,35 @@ public class UserInfoHandler {
 
         out.write("INFO_RESPONSE:NOT_FOUND\n");
         out.flush();
+    }
+    // duatmddnr,1234,염승욱,컴소,교수
+    public void getUserInfo() {
+        String path = "src/main/resources/USER_INFO.txt";
+        StringBuilder sb = new StringBuilder("USER_INFO:");
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 5 && parts[4].equals("학생")) {
+                    if (sb.length() > "USER_INFO:".length()) {
+                        sb.append(";");
+                    }
+                    sb.append(parts[0]); // 학번
+                    sb.append(",");
+                    sb.append(parts[2]); // 이름
+                    sb.append(",");
+                    sb.append(parts[3]); // 전공
+                }
+            }
+            try {
+                out.write(sb.toString());
+                out.newLine();
+                out.flush();
+            } catch (IOException e) {
+                System.out.println("에러발생: " + e.getMessage());
+            }
+        } catch (IOException e) {
+            System.out.println("에러발생: " + e.getMessage());
+        }
     }
 }
