@@ -11,7 +11,6 @@ package Server;
  */
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.*;
 
 public class SessionManager {
@@ -36,13 +35,10 @@ public class SessionManager {
 
     // 대기 사용자 클래스
     public static class PendingClient {
-
-        public final Socket socket;
         public final String userId;
         public final BufferedWriter out;
 
-        public PendingClient(Socket socket, String userId, BufferedWriter out) {
-            this.socket = socket;
+        public PendingClient(String userId, BufferedWriter out) {
             this.userId = userId;
             this.out = out;
         }

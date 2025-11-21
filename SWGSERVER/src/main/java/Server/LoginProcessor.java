@@ -51,8 +51,8 @@ public class LoginProcessor {
         return false;
     }
 
-    public SessionManager.LoginDecision tryUserLogin(String userId, Socket socket, BufferedWriter out) {
-        SessionManager.PendingClient pending = new SessionManager.PendingClient(socket, userId, out);
+    public SessionManager.LoginDecision tryUserLogin(String userId, BufferedWriter out) {
+        SessionManager.PendingClient pending = new SessionManager.PendingClient(userId, out);
         return sessionManager.tryLogin(userId, pending);
     }
 

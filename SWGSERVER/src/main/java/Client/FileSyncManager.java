@@ -25,24 +25,25 @@ public class FileSyncManager {
     private File folder;
     private final Path baseDirectory;
     private final Path backupRootDir;
+    private BufferedWriter out;
     
-    public FileSyncManager() {
+    public FileSyncManager(BufferedWriter out) {
+        this.out = out;
         folder = new File(backupDir);
         if (!folder.exists()) {
             try {
                 folder.mkdir();
-                System.out.println("백업 폴더 생성");
+                //System.out.println("백업 폴더 생성");
             } catch (Exception e) {
                 System.out.println("에러" + e);
             }
-        } else {
-            System.out.println("백업 폴더가 이미 존재합니다.");
-        }
+        } 
+        
         backupRootDir = Paths.get(backupDir);
         baseDirectory = Paths.get(baseDir);
     }
     
-    public String createBackup() {
+    public void createBackup() throws IOException {
         try {
             // 오늘 날짜 저장(포멧 방식: YYYY-MM-DD)
             String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -65,14 +66,14 @@ public class FileSyncManager {
                           }
                       });
             } catch (IOException e) {
-                System.out.println("파일 복사 실패" + e);
-                return "BACKUP_FAIL";
+                System.out.println("파일 복사 실패" + e);               
+                sendMessage("BACKUP_FAIL");
             }
             System.out.println("백업 성공" + targetDir);
-            return "BACKUP_SUCCESS";
+            sendMessage("BACKUP_SUCCESS");
         } catch (Exception e) {
             System.out.println("백업 실패" + e);
-            return "BACKUP_FAIL";
+            sendMessage("BACKUP_FAIL");
         }
     }
     
@@ -81,6 +82,12 @@ public class FileSyncManager {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write(content);
         }
-        System.out.println("[서버] 파일 업데이트 완료: " + filename);
+        
+    }
+    
+    private void sendMessage(String message) throws IOException {
+        out.write(message);
+        out.newLine();
+        out.flush();
     }
 }
