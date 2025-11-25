@@ -6,8 +6,12 @@ package Client;
 
 import Server.SessionManager;
 import Server.LoginProcessor;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -19,6 +23,9 @@ public class LoginManager {
     private LoginProcessor loginProcessor;
     private SessionManager sessionManager;
     private String userId;
+    private static final String USER_PATH = "src/main/resources/USER_LOGIN.txt";
+    private static final String PROFESSOR_PATH = "src/main/resources/PROFESSOR_LOGIN.txt";
+    private static final String ADMIN_PATH = "src/main/resources/ADMIN_LOGIN.txt";
     
     public LoginManager(LoginProcessor loginProcessor, SessionManager sessionManager, BufferedWriter out) {
         this.loginProcessor = loginProcessor;
@@ -95,4 +102,63 @@ public class LoginManager {
     }
     
     public String getUserId() { return userId; }
+    
+    public void checkPassword(String data) {
+        System.out.println("[서버] 비밀번호를 찾겠습니다.");
+        String[] datas = data.split(",");
+        String path = "";
+        if (datas[2].equals("user")) {
+            path = USER_PATH;
+        } else if (datas[2].equals("professor")) {
+            path = PROFESSOR_PATH;
+        } else {
+            path = ADMIN_PATH;
+        }
+        String userId = datas[0];
+        String pwd = getPassword(path, userId);
+        
+        if (pwd == null || pwd.isEmpty()) {
+            StringBuilder sb = new StringBuilder("FIND_PASSWORD:");
+            sb.append("NOT_FOUND");
+            System.out.println("비밀번호: " + sb.toString());
+            try {
+                out.write(sb.toString());
+                out.newLine();
+                out.flush();
+            } catch (IOException ex) {
+                System.out.println("에러 발생: " + ex.getMessage());
+            } 
+        } else if (!pwd.isEmpty()) {
+            StringBuilder sb = new StringBuilder("FIND_PASSWORD:");
+            sb.append(pwd);
+            System.out.println("비밀번호: " + sb.toString());
+            try {
+                out.write(sb.toString());
+                out.newLine();
+                out.flush();
+            } catch (IOException ex) {
+                System.out.println("에러 발생: " + ex.getMessage());
+            } 
+        }
+    }
+    
+    public String getPassword(String path, String userId) {
+        System.out.println("[서버] 파일을 열어 찾습니다.");
+        try (BufferedReader reader = new BufferedReader(
+                                            new InputStreamReader(
+                                                new FileInputStream(path), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts[0].equals(userId)) {
+                    System.out.println("[서버] 찾았습니다.");
+                    return parts[1];
+                }
+            }
+            return null;
+        } catch (IOException e) {
+            System.out.println("에러 발생: " + e.getMessage());     
+            return null;
+        }
+    }
 }

@@ -38,6 +38,7 @@ public class CommandFactory {
         commands.put("INFO_REQUEST:", new InfoRequestCommand(userInfoHandler));
         commands.put("FILE_UPDATE:", new FileUpdateCommand(fileSyncManager));
         commands.put("LOGIN:", new LoginCommand(loginManager));
+        commands.put("FIND_PASSWORD:", new FindPasswordCommand(loginManager));
     }
     
     public Command getCommand(String message) {
