@@ -38,7 +38,8 @@ public class LoginManager {
         if (parts.length < 3) {
             out.write("FAIL");
             out.newLine();
-            out.flush();            
+            out.flush();         
+            return;
         }
 
         userId = parts[0].trim();
@@ -51,7 +52,8 @@ public class LoginManager {
             out.write("FAIL");
             out.newLine();
             out.flush();
-            System.out.println("[서버] 응답: FAIL");            
+            System.out.println("[서버] 응답: FAIL");       
+            return;
         }
 
         if ("admin".equalsIgnoreCase(role)) {
@@ -59,6 +61,7 @@ public class LoginManager {
             out.newLine();
             out.flush();
             System.out.println("[서버] 응답: LOGIN_SUCCESS (admin)");
+            return;
         }
 
 //                    SessionManager.PendingClient pending
