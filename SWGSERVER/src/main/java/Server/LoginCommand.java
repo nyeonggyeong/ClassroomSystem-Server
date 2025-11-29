@@ -24,6 +24,7 @@ public class LoginCommand implements Command {
     @Override
     public void execute(String message, BufferedReader in) throws IOException {
         loginManager.login(message);
+        System.out.println("[서버] LoginCommand 실행");
     }
     
 }

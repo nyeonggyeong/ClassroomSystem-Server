@@ -73,6 +73,7 @@ public class ClientHandlerTest {
     @Test
     @DisplayName("BACKUP_REQUEST 메시지 처리 - Command 실행 확인")
     void testClientHandler_BackupRequest_ExecutesCommand() throws Exception {
+        System.out.println("BACKUP_REQUEST 메시지 처리 - Command 실행 확인");
         try (MockedStatic<SessionManager> mockedStatic = mockStatic(SessionManager.class)) {
             mockedStatic.when(SessionManager::getInstance).thenReturn(sessionManager);
 
@@ -98,6 +99,7 @@ public class ClientHandlerTest {
             // Then
             verify(commandFactory, times(1)).getCommand("BACKUP_REQUEST");
             verify(mockCommand, times(1)).execute(eq("BACKUP_REQUEST"), any(BufferedReader.class));
+            System.out.println("BACKUP_REQUEST 메시지 처리 - Command 실행 성공");
         }
     }
 

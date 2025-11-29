@@ -54,13 +54,6 @@ public class ClientHandler extends Thread {
                     sessionManager.logout(userId);  // 세션에서 제거
                     break; // 스레드 종료
                 }
-                
-                // ─── 로그인 처리 ─────────────────────────────────────
-                // ─── 텍스트 파일 동기화 처리 ──────────────────────────                
-                // ─── 백업 처리 ───────────────────────────────────
-                // ─── 사용자 정보 처리 ───────────────────────────────────
-                // ─── 사용자 정보 요청 처리 ────────────────────────────
-                // ─── 사용자 예약 취소 알람 처리 ───────────────────────────────────
                 Command command = commandFactory.getCommand(msg);
                 if (command != null) {
                     command.execute(msg, in);
@@ -71,7 +64,6 @@ public class ClientHandler extends Thread {
                 } else {
                     System.out.println("[서버] 알 수 없는 요청:" + msg);
                 }
-                
             }
         } catch (IOException e) {
             System.out.println("[서버] 강제종료");

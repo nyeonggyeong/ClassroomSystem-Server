@@ -44,10 +44,7 @@ public class SessionManager {
         }
     }
 
-    public static SessionManager getInstance() {
-        return uniqueInstance;
-    }
-
+   
     public synchronized void addCancelUser(String data) {
         if (data != null && !data.isEmpty()) {
             if (!cancelUsers.contains(data)) {
@@ -96,8 +93,11 @@ public class SessionManager {
         return result;
     }
 
+    public static SessionManager getInstance() {
+        return uniqueInstance;
+    }
+
     public synchronized LoginDecision tryLogin(String userId, PendingClient pending) {
-        // 아이디 만으로 중복 로그인을 시도하면 동일 아이디에 대한 제한이 있어야하거나, 조건이 더 필요
         if (active.contains(userId)) {
             System.out.println("중복 로그인 시도 감지: " + userId);
             return LoginDecision.FAIL_DUP;
@@ -109,6 +109,7 @@ public class SessionManager {
             return LoginDecision.OK;
         } else {
             queue.offer(pending);
+            userStreams.put(userId, pending.out);
             return LoginDecision.WAIT;
         }
     }

@@ -38,12 +38,14 @@ public class CommandFactoryTest {
 
     @Test
     void getCommand_ShouldReturnBackupCommand_WhenMessageIsBackupRequest() {
+        System.out.println("BACKUP_REQUEST Command 확인");
         // When
         Command command = commandFactory.getCommand("BACKUP_REQUEST");
 
         // Then
         assertNotNull(command);
         assertTrue(command instanceof BackupCommand, "BACKUP_REQUEST는 BackupCommand 클래스를 반환해야 합니다.");
+        System.out.println("BACKUP_REQUEST Command 확인 성공");
     }
     
     @Test

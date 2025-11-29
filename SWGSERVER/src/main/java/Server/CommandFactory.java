@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class CommandFactory {
     private final Map<String, Command> commands = new HashMap<>();
-    private LoginCommand loginCommand;
+
     private FileSyncManager fileSyncManager;
     private UserInfoHandler userInfoHandler;
     private RegisterHandler registerHandler;
@@ -48,6 +48,7 @@ public class CommandFactory {
                 return entry.getValue();
             } 
         }
+        
         return null;
     }
     
